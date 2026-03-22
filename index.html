@@ -273,7 +273,7 @@
 
             <div class="ticker">
                 <div class="ticker-track" id="tickerTrack">
-                     JS підставить час сюди 
+                    JS підставить час сюди
                 </div>
             </div>
 
@@ -335,7 +335,75 @@
         </a>
     </nav>
 
+    <!-- SHEET -->
+    <div class="sheet-overlay" id="sheetOverlay">
+        <div class="sheet">
+            <div class="sheet-handle"></div>
+            <button class="sheet-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="black" stroke-width="2" fill="none" /><line x1="12" y1="10" x2="12" y2="16" stroke="black" stroke-width="2" /><circle cx="12" cy="7" r="1.5" fill="black" /></svg><span>Переглянути документ</span></button>
+            <button class="sheet-item"><svg viewBox="0 0 24 24"><path d="M6 2h8l4 4v16H6z" fill="none" stroke="black" stroke-width="2" /><path d="M14 2v4h4" stroke="black" stroke-width="2" /></svg><span>Завантажити PDF</span></button>
+            <button class="sheet-item"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6" fill="none" stroke="black" stroke-width="2" /><polyline points="3 4 3 10 9 10" fill="none" stroke="black" stroke-width="2" /></svg><span>Оновити документ</span></button>
+            <button class="sheet-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="black" stroke-width="2" /><line x1="12" y1="8" x2="12" y2="16" stroke="black" stroke-width="2" /><line x1="8" y1="12" x2="16" y2="12" stroke="black" stroke-width="2" /></svg><span>Розширені дані з реєстру</span></button>
+            <button class="sheet-item"><svg viewBox="0 0 24 24"><path d="M6 2h8l4 4v16H6z" fill="none" stroke="black" stroke-width="2" /><line x1="9" y1="13" x2="15" y2="13" stroke="black" stroke-width="2" /></svg><span>Подати запит на відстрочку</span></button>
+            <button class="sheet-item"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="black" stroke-width="2" stroke-linecap="round" /></svg><span>Направлення на ВЛК</span></button>
+            <button class="sheet-item"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L18.37 9.38l-3.75-3.75L3 17.25z" fill="none" stroke="black" stroke-width="2" /></svg><span>Уточнити контактні дані</span></button>
+        </div>
+    </div>
+
     <script>
+        // Тicker
+        const tickerTrack = document.getElementById('tickerTrack');
+
+        function getCurrentTickerText() {
+            const now = new Date();
+            const h = now.getHours().toString().padStart(2, '0');
+            const m = now.getMinutes().toString().padStart(2, '0');
+            const d = now.getDate().toString().padStart(2, '0');
+            const mo = (now.getMonth() + 1).toString().padStart(2, '0');
+            const y = now.getFullYear();
+            return `Документ оновлено о ${h}:${m} | ${d}.${mo}.${y} • `;
+        }
+        function updateTicker() { tickerTrack.innerHTML = getCurrentTickerText().repeat(20); }
+        updateTicker();
+        setInterval(updateTicker, 60000);
+
+        // Додати кнопку меню
+        const addBtn = document.querySelector('.add-btn');
+        const sheetOverlay = document.getElementById('sheetOverlay');
+        addBtn.addEventListener('click', () => sheetOverlay.classList.add('active'));
+        sheetOverlay.addEventListener('click', e => { if (e.target === sheetOverlay) sheetOverlay.classList.remove('active'); });
+
+        // Кнопка оновлення документу
+        const updateButton = Array.from(document.querySelectorAll('.sheet-item')).find(btn => btn.querySelector('span')?.textContent.includes('Оновити документ'));
+        // "Кращих часів"
+        const deferValue = Array.from(document.querySelectorAll('.value')).find(v => v.textContent.includes('Завершення мобілізації'));
+
+        updateButton.addEventListener('click', () => {
+            // сховати меню
+            sheetOverlay.classList.remove('active');
+            // зберегти старий фон
+            const tickerContainer = tickerTrack.parentElement;
+            const oldBg = tickerContainer.style.background || '#6a4e27';
+            const oldColor = tickerTrack.style.color || 'white';
+            // змінити фон і текст
+            tickerContainer.style.background = 'yellow';
+            tickerTrack.style.color = 'black';
+            tickerTrack.innerHTML = 'Оновлення даних • '.repeat(50);
+
+            // Сховати "Кращих часів"
+            deferValue.style.opacity = 0;
+
+            // через 10 сек повернути
+            setTimeout(() => {
+                tickerContainer.style.background = oldBg;
+                tickerTrack.style.color = oldColor;
+                updateTicker();
+                // Показати "Кращих часів"
+                deferValue.style.opacity = 1;
+            }, 10000);
+        });
+    </script>
+
+    <!--<script>
         // Поточний час і дата при завантаженні сторінки
         const now = new Date();
         const hours = now.getHours().toString().padStart(2, '0');
@@ -350,7 +418,7 @@
 
         // Додаємо кілька повторів для прокрутки
         tickerTrack.innerHTML = currentTime.repeat(4);
-    </script>
+    </script>-->
 
 </body>
 </html>
